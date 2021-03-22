@@ -1,8 +1,8 @@
 package io.hndrs.sample
 
-import io.hndrs.annotation.GenerateRepository
-import io.hndrs.annotation.GenerateRepository.Type
-import io.hndrs.annotation.Options
+import io.hndrs.annotation.processing.repository.GenerateRepository
+import io.hndrs.annotation.processing.repository.GenerateRepository.Type
+import io.hndrs.annotation.processing.repository.Options
 import org.springframework.data.annotation.Id
 import java.time.Instant
 

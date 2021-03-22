@@ -1,4 +1,4 @@
-package io.hndrs.annotation
+package io.hndrs.annotation.processing.repository
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)

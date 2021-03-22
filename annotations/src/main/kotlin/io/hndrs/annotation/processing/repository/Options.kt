@@ -1,4 +1,4 @@
-package io.hndrs.annotation
+package io.hndrs.annotation.processing.repository
 
 import java.lang.annotation.Inherited
 

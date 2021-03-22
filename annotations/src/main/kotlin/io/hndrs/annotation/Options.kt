@@ -20,18 +20,47 @@ annotation class Options(
     val exclude: Boolean = false,
 
     /**
-     * Option to exclude field as query parameter
+     * Option to add 'less than equals field' as query parameter
      */
     val withLte: Boolean = false,
 
+    /**
+     * Option to add 'less than field' as query parameter
+     */
     val withLt: Boolean = false,
 
+    /**
+     * Option to add 'greater than equals field' as query parameter
+     */
     val withGte: Boolean = false,
 
+    /**
+     * Option to add 'greater than field' as query parameter
+     */
     val withGt: Boolean = false,
 
+    /**
+     * Option to add '$exists' as query parameter
+     */
     val withExists: Boolean = false,
 
+    /**
+     * Option to add '$size' as query parameter
+     */
     val withSize: Boolean = false,
 
-    )
+    /**
+     * Option to add '$in' as query parameter
+     */
+    val withIn: Boolean = false,
+
+    /**
+     * Option to add '$all' as query parameter
+     */
+    val withAll: Boolean = false,
+
+    /**
+     * Option to add '$ne' as query parameter
+     */
+    val withNe: Boolean = false,
+)

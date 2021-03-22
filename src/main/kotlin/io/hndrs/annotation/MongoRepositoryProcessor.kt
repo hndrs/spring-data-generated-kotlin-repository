@@ -86,18 +86,18 @@ class MongoRepositoryProcessor : AbstractProcessor() {
                 it.appendLine(generatedAnnotation(generationTimeStamp))
                 it.appendLine("interface $generatedCustomRepositoryName {")
                 it.appendLine()
-                it.appendLine("    fun findOneAndSave(${args(params, true)}, update: Function1<$entityTypeName, $entityTypeName>): $entityTypeName?")
+                it.appendLine("    fun findOneAndSave(${args(params, true)}, update: Function1<$entityTypeName, $entityTypeName>\n\t): $entityTypeName?")
                 it.appendLine()
-                it.appendLine("    fun findBy(${args(params, true)}): List<$entityTypeName>")
+                it.appendLine("    fun findBy(${args(params, true)}\n\t): List<$entityTypeName>")
                 it.appendLine("}")
                 it.appendLine()
                 it.appendLine(generatedAnnotation(generationTimeStamp))
                 it.appendLine("class ${generatedCustomRepositoryName}Impl(private val template: MongoTemplate): $generatedCustomRepositoryName{")
                 it.appendLine()
-                it.appendLine("    override fun findOneAndSave(${args(params)}, update: Function1<$entityTypeName, $entityTypeName>): $entityTypeName? {")
+                it.appendLine("    override fun findOneAndSave(${args(params)}, update: Function1<$entityTypeName, $entityTypeName>\n\t): $entityTypeName? {")
                 it.appendLine("        val criterias:MutableList<Criteria> = mutableListOf()")
                 it.appendLine()
-                it.appendWhereCriterias(params)
+                it.appendCriterias(params)
                 it.appendLine()
                 it.appendLine("        val query = Query(Criteria().andOperator(*criterias.toTypedArray()))")
                 it.appendLine("        return template.findOne(query, $entityTypeName::class.java)?.let {")
@@ -105,10 +105,10 @@ class MongoRepositoryProcessor : AbstractProcessor() {
                 it.appendLine("        }")
                 it.appendLine("    }")
                 it.appendLine()
-                it.appendLine("    override fun findBy(${args(params)}): List<$entityTypeName> {")
+                it.appendLine("    override fun findBy(${args(params)}\n\t): List<$entityTypeName> {")
                 it.appendLine("        val criterias:MutableList<Criteria> = mutableListOf()")
                 it.appendLine()
-                it.appendWhereCriterias(params)
+                it.appendCriterias(params)
                 it.appendLine()
                 it.appendLine("        val query = Query(Criteria().andOperator(*criterias.toTypedArray()))")
                 it.appendLine("        return template.find(query, $entityTypeName::class.java)")
@@ -134,28 +134,37 @@ class MongoRepositoryProcessor : AbstractProcessor() {
         }
 
 
-        fun Appendable.appendWhereCriterias(valueParameters: List<ModelHelper.ValueParameterDefinition>) {
+        fun Appendable.appendCriterias(valueParameters: List<ModelHelper.ValueParameterDefinition>) {
             valueParameters.filter(EXCLUDE_PARAMETER)
                 .forEach {
-                    this.appendLine("        ${it.propertyName}?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").`is`(it))}")
+                    this.appendLine("        ${it.propertyName}?.let{ criterias.add(Criteria.where(\"${it.queryKey()}\").`is`(it))}")
                     it.options?.let { options ->
                         if (options.withLte) {
-                            this.appendLine("        ${it.propertyName}Lte?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").lte(it))}")
+                            this.appendLine("        ${it.propertyName}Lte?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").lte(it))}")
                         }
                         if (options.withLt) {
-                            this.appendLine("        ${it.propertyName}Lt?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").lt(it))}")
+                            this.appendLine("        ${it.propertyName}Lt?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").lt(it))}")
                         }
                         if (options.withGt) {
-                            this.appendLine("        ${it.propertyName}Gt?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").gt(it))}")
+                            this.appendLine("        ${it.propertyName}Gt?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").gt(it))}")
                         }
                         if (options.withGte) {
-                            this.appendLine("        ${it.propertyName}Gte?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").gte(it))}")
+                            this.appendLine("        ${it.propertyName}Gte?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").gte(it))}")
                         }
                         if (options.withExists) {
-                            this.appendLine("        ${it.propertyName}Exists?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").exists(it))}")
+                            this.appendLine("        ${it.propertyName}Exists?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").exists(it))}")
                         }
                         if (options.withSize) {
-                            this.appendLine("        ${it.propertyName}Size?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").size(it))}")
+                            this.appendLine("        ${it.propertyName}Size?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").size(it))}")
+                        }
+                        if (options.withIn) {
+                            this.appendLine("        ${it.propertyName}In?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").`in`(it))}")
+                        }
+                        if (options.withAll) {
+                            this.appendLine("        ${it.propertyName}In?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").all(it))}")
+                        }
+                        if (options.withNe) {
+                            this.appendLine("        ${it.propertyName}In?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").ne(it))}")
                         }
                     }
                 }
@@ -185,6 +194,15 @@ class MongoRepositoryProcessor : AbstractProcessor() {
                         if (options.withSize) {
                             args.add("${it.propertyName}Size: Int?")
                         }
+                        if (options.withIn) {
+                            args.add("${it.propertyName}In: Collection<${it.propertyType.simpleName}>?")
+                        }
+                        if (options.withAll) {
+                            args.add("${it.propertyName}All: Collection<${it.propertyType.simpleName}>?")
+                        }
+                        if (options.withNe) {
+                            args.add("${it.propertyName}Ne: ${it.propertyType.simpleName}?")
+                        }
                     }
                     args
                 }
@@ -195,6 +213,9 @@ class MongoRepositoryProcessor : AbstractProcessor() {
                     } else {
                         it
                     }
+                }
+                .map {
+                    "\n\t\t$it"
                 }
                 .joinToString(separator = ", ")
         }
@@ -279,6 +300,11 @@ object ModelHelper {
         val propertyType: KClass<*>,
         val fieldAnnoationName: String?,
         val options: Options?
-    )
+    ) {
+        fun queryKey(): String {
+            return this.fieldAnnoationName ?: this.propertyName
+        }
+    }
+
 }
 

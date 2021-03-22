@@ -20,7 +20,10 @@ data class User(
 
     val name2: String = "",
 
-    @Options(updateOnSave = false, withLte = true, withExists = true)
+    @Options(
+        updateOnSave = false, withLte = true, withExists = true, withIn = true,
+        withSize = true, withLt = true, withGte = true, withGt = true, withAll = true, withNe = true
+    )
     val createdAt: Instant,
 
     @Options(updateOnSave = true)

@@ -30,24 +30,22 @@ class MongoRepositoryProcessor : AbstractProcessor() {
         return SourceVersion.latestSupported()
     }
 
-    private companion object {
-        val KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated"
-        val GENERATE_ERROR = "generate.error"
-    }
-
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment): Boolean {
 
         for (annotation in annotations!!) {
             val annotatedElements: Set<Element> = roundEnv.getElementsAnnotatedWith(annotation)
             annotatedElements.forEach {
-                it.getAnnotation(GenerateRepository::class.java)
-                writeClass(
-                    ModelHelper.getPackageName(it),
-                    it.simpleName.toString(),
-                    ModelHelper.getIdType(it),
-                    ModelHelper.getProperties(it),
-                    it.getAnnotation(GenerateRepository::class.java)
-                )
+                try {
+                    writeClass(
+                        ModelHelper.getPackageName(it),
+                        it.simpleName.toString(),
+                        ModelHelper.getIdType(it),
+                        ModelHelper.getProperties(it),
+                        it.getAnnotation(GenerateRepository::class.java)
+                    )
+                } catch (e: Exception) {
+                    println(e)
+                }
             }
         }
         return true
@@ -123,45 +121,97 @@ class MongoRepositoryProcessor : AbstractProcessor() {
         }
     }
 
-    private fun generatedAnnotation(timeStamp: Instant): String {
-        return "@Generated(value = [\"${this::class.qualifiedName}\"], date = \"$timeStamp\", comments = \"\")"
-    }
+    private companion object {
+        val KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated"
+        val GENERATE_ERROR = "generate.error"
 
-
-    fun Appendable.appendWhereCriterias(valueParameters: List<ModelHelper.ValueParameterDefinition>) {
-        valueParameters.filter {
-            it.options?.exclude?.not() ?: true
-        }.forEach {
-            this.appendLine("        ${it.propertyName}?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").`is`(it))}")
-        }
-    }
-
-    private fun args(valueParameters: List<ModelHelper.ValueParameterDefinition>, withDefaults: Boolean = false): String {
-        return valueParameters.filter {
+        val EXCLUDE_PARAMETER: (ModelHelper.ValueParameterDefinition) -> Boolean = {
             it.options?.exclude?.not() ?: true
         }
-            .map { "${it.propertyName}: ${it.propertyType.simpleName}?" }
-            .map {
-                if (withDefaults) {
-                    "$it = null"
-                } else {
-                    it
-                }
-            }.joinToString(separator = ", ")
-    }
 
-    private fun updateOnSave(valueParameters: List<ModelHelper.ValueParameterDefinition>): String {
-        return valueParameters.filter {
-            it.options?.updateOnSave ?: false
+        fun generatedAnnotation(timeStamp: Instant): String {
+            return "@Generated(value = [\"${this::class.qualifiedName}\"], date = \"$timeStamp\", comments = \"\")"
         }
-            .filter { it.propertyType == Instant::class }
-            .joinToString(", ") { "${it.propertyName} = Instant.now()" }
-            .also {
-                if (!it.isBlank()) {
-                    return ".copy($it)"
+
+
+        fun Appendable.appendWhereCriterias(valueParameters: List<ModelHelper.ValueParameterDefinition>) {
+            valueParameters.filter(EXCLUDE_PARAMETER)
+                .forEach {
+                    this.appendLine("        ${it.propertyName}?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").`is`(it))}")
+                    it.options?.let { options ->
+                        if (options.withLte) {
+                            this.appendLine("        ${it.propertyName}Lte?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").lte(it))}")
+                        }
+                        if (options.withLt) {
+                            this.appendLine("        ${it.propertyName}Lt?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").lt(it))}")
+                        }
+                        if (options.withGt) {
+                            this.appendLine("        ${it.propertyName}Gt?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").gt(it))}")
+                        }
+                        if (options.withGte) {
+                            this.appendLine("        ${it.propertyName}Gte?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").gte(it))}")
+                        }
+                        if (options.withExists) {
+                            this.appendLine("        ${it.propertyName}Exists?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").exists(it))}")
+                        }
+                        if (options.withSize) {
+                            this.appendLine("        ${it.propertyName}Size?.let{ criterias.add(Criteria.where(\"${it.fieldAnnoationName ?: it.propertyName}\").size(it))}")
+                        }
+                    }
                 }
+        }
+
+        fun args(valueParameters: List<ModelHelper.ValueParameterDefinition>, withDefaults: Boolean = false): String {
+            return valueParameters.filter(EXCLUDE_PARAMETER)
+                .flatMap {
+                    val args = mutableListOf<String>()
+                    args.add("${it.propertyName}: ${it.propertyType.simpleName}?")
+                    it.options?.let { options ->
+                        if (options.withLte) {
+                            args.add("${it.propertyName}Lte: ${it.propertyType.simpleName}?")
+                        }
+                        if (options.withLt) {
+                            args.add("${it.propertyName}Lt: ${it.propertyType.simpleName}?")
+                        }
+                        if (options.withGt) {
+                            args.add("${it.propertyName}Gt: ${it.propertyType.simpleName}?")
+                        }
+                        if (options.withGte) {
+                            args.add("${it.propertyName}Gte: ${it.propertyType.simpleName}?")
+                        }
+                        if (options.withExists) {
+                            args.add("${it.propertyName}Exists: Boolean?")
+                        }
+                        if (options.withSize) {
+                            args.add("${it.propertyName}Size: Int?")
+                        }
+                    }
+                    args
+                }
+                .map {
+                    println(it)
+                    if (withDefaults) {
+                        "$it = null"
+                    } else {
+                        it
+                    }
+                }
+                .joinToString(separator = ", ")
+        }
+
+        fun updateOnSave(valueParameters: List<ModelHelper.ValueParameterDefinition>): String {
+            return valueParameters.filter {
+                it.options?.updateOnSave ?: false
             }
+                .filter { it.propertyType == Instant::class }
+                .joinToString(", ") { "${it.propertyName} = Instant.now()" }
+                .also {
+                    if (!it.isBlank()) {
+                        return ".copy($it)"
+                    }
+                }
 
+        }
     }
 }
 

@@ -43,7 +43,7 @@ repositories {
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "hndrs_kotlin-data-mongodb-spring-boot-starter")
+        property("sonar.projectKey", "hndrs_spring-data-generated-kotlin-repository")
         property("sonar.organization", "hndrs")
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.exclusions", "**/sample/**")

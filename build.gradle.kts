@@ -153,10 +153,10 @@ publishing {
 
 publishingInfo {
     name = rootProject.name
-    description = "Kotlin Extensions for Spring Data MongoDB"
-    url = "https://github.com/hndrs/spring-data-mongodb-kotlin-extension"
+    description = "Kotlin Extensions for Spring Data"
+    url = "https://github.com/hndrs/spring-data-generated-kotlin-repository"
     license = io.hndrs.gradle.plugin.License(
-        "https://github.com/hndrs/spring-data-mongodb-kotlin-extension/blob/main/LICENSE",
+        "https://github.com/hndrs/spring-data-generated-kotlin-repository/blob/main/LICENSE",
         "MIT License"
     )
     developers = listOf(
@@ -164,7 +164,7 @@ publishingInfo {
     )
     organization = io.hndrs.gradle.plugin.Organization("hndrs", "https://oss.hndrs.io")
     scm = io.hndrs.gradle.plugin.Scm(
-        "scm:git:git://github.com/hndrs/spring-data-mongodb-kotlin-extension",
-        "https://github.com/hndrs/spring-data-mongodb-kotlin-extension"
+        "scm:git:git://github.com/hndrs/spring-data-generated-kotlin-repository",
+        "https://github.com/hndrs/spring-data-generated-kotlin-repository"
     )
 }

@@ -90,6 +90,11 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.mockk:mockk:1.10.6")
+    testImplementation("org.assertj:assertj-core:3.19.0")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.3.6")
+    //For the test to compile the generated repository we need the spring dependencies
+    testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
 }
 
 dependencyManagement {

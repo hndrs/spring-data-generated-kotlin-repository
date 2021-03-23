@@ -45,7 +45,7 @@ class SpringRepositoryProcessor : AbstractProcessor() {
                     }
 
                 } catch (e: Exception) {
-                    processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "Could not write class due to exception $e")
+                    processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, e.message)
                 }
             }
         }

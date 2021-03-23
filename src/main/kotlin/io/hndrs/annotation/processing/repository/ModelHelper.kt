@@ -27,12 +27,13 @@ object ModelHelper {
         return packageName
     }
 
+    @Throws(RepositoryGeneratorException::class)
     fun getIdTypeName(element: Element): String {
-        return element.enclosedElements.first {
+        return element.enclosedElements.firstOrNull {
             it.getAnnotation(Id::class.java) != null
-        }.let {
+        }?.let {
             getClass(it).simpleName.toString()
-        }
+        } ?: throw RepositoryGeneratorException("Could not find @Id annotated property")
     }
 
     fun getParameterMetas(element: Element): List<ParameterMeta> {

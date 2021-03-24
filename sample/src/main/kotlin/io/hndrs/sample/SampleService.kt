@@ -4,16 +4,16 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 import java.time.Instant
 
+
 @Component
 class SampleService(private val userRepository: UserRepository) : CommandLineRunner {
 
 
     fun test() {
-        val user = User("sampleId", "sampleName", "", "", Instant.now(), Instant.now())
+        val user = User("sampleId", "sampleName", "", listOf(), "", "", Instant.now())
         userRepository.save(user)
-
-        userRepository.findOneAndSave(name = user.name) {
-            it.copy(name = "newName")
+        userRepository.findOneAndSave(id = user.id) {
+            it.copy(id = "newId")
         }
 
         userRepository.findAll().let { println(it[0]) }

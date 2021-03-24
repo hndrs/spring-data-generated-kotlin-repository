@@ -6,8 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Field
 import javax.lang.model.element.Element
 import javax.lang.model.element.PackageElement
 import javax.lang.model.element.VariableElement
+import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
-import kotlin.reflect.KClass
 
 object ModelHelper {
 
@@ -31,11 +31,11 @@ object ModelHelper {
     }
 
     @Throws(RepositoryGeneratorException::class)
-    fun getIdTypeName(element: Element): String {
+    fun getIdTypeSimpleName(element: Element): String {
         return element.enclosedElements.firstOrNull {
             it.getAnnotation(Id::class.java) != null
         }?.let {
-            getClass(it).simpleName.toString()
+            getSimpleName(it)
         } ?: throw RepositoryGeneratorException("Could not find @Id annotated property in ${element.simpleName}")
     }
 
@@ -48,28 +48,58 @@ object ModelHelper {
                     ?.getString("name")
                 ParameterMeta(
                     it.simpleName.toString(),
-                    getClass(it),
+                    getQualifiedName(it),
+                    getSimpleName(it),
                     fieldAnnoationName,
                     it.getAnnotation(Options::class.java)
                 )
             }
     }
 
-    private fun getClass(it: Element): KClass<*> {
+    private fun getQualifiedName(it: Element): String {
         val type = it.asType()
 
         return when (type.kind) {
-            TypeKind.DECLARED -> Class.forName(type.toString()).kotlin
-            TypeKind.BOOLEAN -> Boolean::class
-            TypeKind.BYTE -> Byte::class
-            TypeKind.SHORT -> Short::class
-            TypeKind.INT -> Int::class
-            TypeKind.LONG -> Long::class
-            TypeKind.CHAR -> Char::class
-            TypeKind.FLOAT -> Float::class
-            TypeKind.DOUBLE -> Double::class
+            TypeKind.DECLARED -> (type as DeclaredType).asElement().toString()
+            TypeKind.BOOLEAN -> Boolean::class.qualifiedName!!
+            TypeKind.BYTE -> Byte::class.qualifiedName!!
+            TypeKind.SHORT -> Short::class.qualifiedName!!
+            TypeKind.INT -> Int::class.qualifiedName!!
+            TypeKind.LONG -> Long::class.qualifiedName!!
+            TypeKind.CHAR -> Char::class.qualifiedName!!
+            TypeKind.FLOAT -> Float::class.qualifiedName!!
+            TypeKind.DOUBLE -> Double::class.qualifiedName!!
             else -> throw Exception("Unknown type: $type, kind: ${type.kind}")
         }
     }
 
+    private fun getSimpleName(it: Element): String {
+        val type = it.asType()
+
+        return when (type.kind) {
+            TypeKind.DECLARED -> declaredTypeSimple(type as DeclaredType)
+            TypeKind.BOOLEAN -> Boolean::class.simpleName!!
+            TypeKind.BYTE -> Byte::class.simpleName!!
+            TypeKind.SHORT -> Short::class.simpleName!!
+            TypeKind.INT -> Int::class.simpleName!!
+            TypeKind.LONG -> Long::class.simpleName!!
+            TypeKind.CHAR -> Char::class.simpleName!!
+            TypeKind.FLOAT -> Float::class.simpleName!!
+            TypeKind.DOUBLE -> Double::class.simpleName!!
+            else -> throw Exception("Unknown type: $type, kind: ${type.kind}")
+        }
+    }
+
+    private fun declaredTypeSimple(declaredType: DeclaredType): String {
+        val simpleName = declaredType.asElement().simpleName.toString()
+        return return if (declaredType.typeArguments.isEmpty()) {
+            simpleName
+        } else if (declaredType.typeArguments.size == 1) {
+            val genericSimpleType = ((declaredType.typeArguments[0]) as DeclaredType).asElement().simpleName.toString()
+
+            "$simpleName<$genericSimpleType>"
+        } else {
+            throw RepositoryGeneratorException("Can not resolve generics with more than 1 generic argument")
+        }
+    }
 }

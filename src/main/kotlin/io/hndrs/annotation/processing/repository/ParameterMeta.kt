@@ -1,10 +1,9 @@
 package io.hndrs.annotation.processing.repository
 
-import kotlin.reflect.KClass
-
 data class ParameterMeta(
     val propertyName: String,
-    val propertyType: KClass<*>,
+    val propertyTypeQualifiedName: String,
+    val propertyTypeSimpleName: String,
     val fieldAnnoationName: String?,
     val options: Options?
 ) {

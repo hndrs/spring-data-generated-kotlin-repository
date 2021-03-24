@@ -15,11 +15,11 @@ data class AllOptionsEntity(
     @Field("optionsName")
     val fieldName: String,
 
-    @Options(withNe = true, withAll = true, withExists = true)
+    @Options(withNe = true, withIn = true, withExists = true)
     val options: String,
 
-    @Options(withIn = true, withSize = true)
-    val list: List<String>,
+    @Options(withSize = true, withAll = true)
+    val listVar: List<String>,
 
     @Options(withLte = true, withLt = true, withGt = true, withGte = true)
     val otherOptions: String,

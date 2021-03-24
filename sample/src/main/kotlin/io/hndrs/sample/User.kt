@@ -4,6 +4,7 @@ import io.hndrs.annotation.processing.repository.GenerateRepository
 import io.hndrs.annotation.processing.repository.GenerateRepository.Type
 import io.hndrs.annotation.processing.repository.Options
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Field
 import java.time.Instant
 
 
@@ -13,19 +14,21 @@ data class User(
     @Id
     val id: String,
 
+    @Field("optionsName")
+    val fieldName: String,
+
+    @Options(withNe = true, withAll = true, withExists = true)
+    val options: String,
+
+    @Options(withIn = true, withSize = true)
+    val list: List<String>,
+
+    @Options(withLte = true, withLt = true, withGt = true, withGte = true)
+    val otherOptions: String,
+
+    @Options(exclude = true)
+    val excluded: String,
+
     @Options(updateOnSave = true)
-    val name: String,
-
-    val name1: String = "",
-
-    val name2: String = "",
-
-    @Options(
-        updateOnSave = false, withLte = true, withExists = true, withIn = true,
-        withSize = true, withLt = true, withGte = true, withGt = true, withAll = true, withNe = true
-    )
-    val createdAt: Instant,
-
-    @Options(updateOnSave = true)
-    val lastModifiedAt: Instant,
+    val lastModifiedAt: Instant
 )

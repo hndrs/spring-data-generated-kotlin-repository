@@ -5,7 +5,6 @@ import java.io.File
 import java.time.Instant
 import javax.annotation.processing.ProcessingEnvironment
 import javax.tools.Diagnostic
-import kotlin.reflect.KClass
 
 object MongoRepsitoryGenerator : RepsitoryGenerator {
 
@@ -20,7 +19,11 @@ object MongoRepsitoryGenerator : RepsitoryGenerator {
         val generationTimeStamp = Instant.now()
         val generatedRepositoryName = "${entityTypeName}Repository"
         val generatedCustomRepositoryName = "${entityTypeName}RepositoryExtension"
-        val imports: List<KClass<*>> = params.map { it.propertyType }.distinct()
+        val imports: List<String> = params.map { it.propertyTypeQualifiedName }
+            .filter { !it.startsWith("kotlin.") }
+            .filter { !it.startsWith("java.lang") }
+            .filter { !it.startsWith("java.util") }
+            .distinct()
 
         File(processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION], "${entityTypeName}Repository.kt")
             .writer()
@@ -33,7 +36,7 @@ object MongoRepsitoryGenerator : RepsitoryGenerator {
                 it.appendLine("import org.springframework.data.mongodb.core.query.Query")
                 it.appendLine("import org.springframework.data.mongodb.repository.MongoRepository")
                 imports.forEach { import ->
-                    it.appendLine("import ${import.qualifiedName}")
+                    it.appendLine("import ${import}")
                 }
                 if (!extensionOnly) {
                     it.appendLine()
@@ -115,10 +118,10 @@ object MongoRepsitoryGenerator : RepsitoryGenerator {
                         this.appendLine("        ${it.propertyName}In?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").`in`(it))}")
                     }
                     if (options.withAll) {
-                        this.appendLine("        ${it.propertyName}In?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").all(it))}")
+                        this.appendLine("        ${it.propertyName}All?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").all(it))}")
                     }
                     if (options.withNe) {
-                        this.appendLine("        ${it.propertyName}In?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").ne(it))}")
+                        this.appendLine("        ${it.propertyName}Ne?.let { criterias.add(Criteria.where(\"${it.queryKey()}\").ne(it))}")
                     }
                 }
             }
@@ -128,19 +131,19 @@ object MongoRepsitoryGenerator : RepsitoryGenerator {
         return parameters.filter(EXCLUDE_PARAMETER)
             .flatMap {
                 val args = mutableListOf<String>()
-                args.add("${it.propertyName}: ${it.propertyType.simpleName}?")
+                args.add("${it.propertyName}: ${it.propertyTypeSimpleName}?")
                 it.options?.let { options ->
                     if (options.withLte) {
-                        args.add("${it.propertyName}Lte: ${it.propertyType.simpleName}?")
+                        args.add("${it.propertyName}Lte: ${it.propertyTypeSimpleName}?")
                     }
                     if (options.withLt) {
-                        args.add("${it.propertyName}Lt: ${it.propertyType.simpleName}?")
+                        args.add("${it.propertyName}Lt: ${it.propertyTypeSimpleName}?")
                     }
                     if (options.withGt) {
-                        args.add("${it.propertyName}Gt: ${it.propertyType.simpleName}?")
+                        args.add("${it.propertyName}Gt: ${it.propertyTypeSimpleName}?")
                     }
                     if (options.withGte) {
-                        args.add("${it.propertyName}Gte: ${it.propertyType.simpleName}?")
+                        args.add("${it.propertyName}Gte: ${it.propertyTypeSimpleName}?")
                     }
                     if (options.withExists) {
                         args.add("${it.propertyName}Exists: Boolean?")
@@ -149,13 +152,13 @@ object MongoRepsitoryGenerator : RepsitoryGenerator {
                         args.add("${it.propertyName}Size: Int?")
                     }
                     if (options.withIn) {
-                        args.add("${it.propertyName}In: Collection<${it.propertyType.simpleName}>?")
+                        args.add("${it.propertyName}In: Collection<${it.propertyTypeSimpleName}>?")
                     }
                     if (options.withAll) {
-                        args.add("${it.propertyName}All: Collection<${it.propertyType.simpleName}>?")
+                        args.add("${it.propertyName}All: Collection<${it.propertyTypeSimpleName}>?")
                     }
                     if (options.withNe) {
-                        args.add("${it.propertyName}Ne: ${it.propertyType.simpleName}?")
+                        args.add("${it.propertyName}Ne: ${it.propertyTypeSimpleName}?")
                     }
                 }
                 args
@@ -178,7 +181,7 @@ object MongoRepsitoryGenerator : RepsitoryGenerator {
         return parameters.filter {
             it.options?.updateOnSave ?: false
         }
-            .filter { it.propertyType == Instant::class }
+            .filter { it.propertyTypeQualifiedName == Instant::class.qualifiedName!! }
             .joinToString(", ") { "${it.propertyName} = Instant.now()" }
             .also {
                 if (!it.isBlank()) {

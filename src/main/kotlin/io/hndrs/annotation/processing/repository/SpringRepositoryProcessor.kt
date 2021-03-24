@@ -31,7 +31,7 @@ class SpringRepositoryProcessor : AbstractProcessor() {
                     val generateRepository = it.getAnnotation(GenerateRepository::class.java)
                     val packageName = ModelHelper.getPackageName(it)
                     val entityTypeName = it.simpleName.toString()
-                    val entityIdTypeName = ModelHelper.getIdTypeName(it)
+                    val entityIdTypeName = ModelHelper.getIdTypeSimpleName(it)
                     val params = ModelHelper.getParameterMetas(it)
                     when (generateRepository.type) {
                         Type.MONGO -> MongoRepsitoryGenerator.writeClass(

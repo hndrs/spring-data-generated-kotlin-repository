@@ -17,10 +17,10 @@ data class User(
     @Field("optionsName")
     val fieldName: String,
 
-    @Options(withNe = true, withAll = true, withExists = true)
+    @Options(withNe = true, withIn = true, withExists = true)
     val options: String,
 
-    @Options(withIn = true, withSize = true)
+    @Options(withAll = true, withSize = true)
     val list: List<String>,
 
     @Options(withLte = true, withLt = true, withGt = true, withGte = true)

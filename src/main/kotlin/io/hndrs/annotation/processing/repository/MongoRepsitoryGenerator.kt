@@ -152,10 +152,10 @@ object MongoRepsitoryGenerator : RepsitoryGenerator {
                         args.add("${it.propertyName}Size: Int?")
                     }
                     if (options.withIn) {
-                        args.add("${it.propertyName}In: Collection<${it.propertyTypeSimpleName}>?")
+                        args.add("${it.propertyName}In: Collection<${it.propertyTypeGenericSimpleName ?: it.propertyTypeSimpleName}>?")
                     }
                     if (options.withAll) {
-                        args.add("${it.propertyName}All: Collection<${it.propertyTypeSimpleName}>?")
+                        args.add("${it.propertyName}All: Collection<${it.propertyTypeGenericSimpleName ?: it.propertyTypeSimpleName}>?")
                     }
                     if (options.withNe) {
                         args.add("${it.propertyName}Ne: ${it.propertyTypeSimpleName}?")

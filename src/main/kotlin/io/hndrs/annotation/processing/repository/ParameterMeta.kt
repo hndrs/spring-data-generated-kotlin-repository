@@ -4,10 +4,11 @@ data class ParameterMeta(
     val propertyName: String,
     val propertyTypeQualifiedName: String,
     val propertyTypeSimpleName: String,
-    val fieldAnnoationName: String?,
+    val propertyTypeGenericSimpleName: String?,
+    val fieldAnnotationName: String?,
     val options: Options?
 ) {
     fun queryKey(): String {
-        return this.fieldAnnoationName ?: this.propertyName
+        return this.fieldAnnotationName ?: this.propertyName
     }
 }

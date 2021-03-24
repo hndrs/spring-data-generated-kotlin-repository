@@ -50,6 +50,7 @@ object ModelHelper {
                     it.simpleName.toString(),
                     getQualifiedName(it),
                     getSimpleName(it),
+                    getGenericSimpleName(it),
                     fieldAnnoationName,
                     it.getAnnotation(Options::class.java)
                 )
@@ -73,6 +74,14 @@ object ModelHelper {
         }
     }
 
+    private fun getGenericSimpleName(element: Element): String? {
+        val declaredType = element.asType() as DeclaredType
+        if (declaredType.typeArguments.size == 1) {
+            return (declaredType.typeArguments[0] as DeclaredType).asElement().simpleName.toString()
+        }
+        return null
+    }
+
     private fun getSimpleName(it: Element): String {
         val type = it.asType()
 
@@ -92,7 +101,7 @@ object ModelHelper {
 
     private fun declaredTypeSimple(declaredType: DeclaredType): String {
         val simpleName = declaredType.asElement().simpleName.toString()
-        return return if (declaredType.typeArguments.isEmpty()) {
+        return if (declaredType.typeArguments.isEmpty()) {
             simpleName
         } else if (declaredType.typeArguments.size == 1) {
             val genericSimpleType = ((declaredType.typeArguments[0]) as DeclaredType).asElement().simpleName.toString()

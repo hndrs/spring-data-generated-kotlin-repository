@@ -28,19 +28,13 @@ class SpringRepositoryProcessor : AbstractProcessor() {
             val annotatedElements: Set<Element> = roundEnv.getElementsAnnotatedWith(annotation)
             annotatedElements.forEach {
                 try {
+
+                    val metaInformation = MetaInformation.create(it)
                     val generateRepository = it.getAnnotation(GenerateRepository::class.java)
-                    val packageName = ModelHelper.getPackageName(it)
-                    val entityTypeName = it.simpleName.toString()
-                    val entityIdTypeName = ModelHelper.getIdTypeSimpleName(it)
-                    val params = ModelHelper.getParameterMetas(it)
                     when (generateRepository.type) {
                         Type.MONGO -> MongoRepsitoryGenerator.writeClass(
                             processingEnv,
-                            packageName,
-                            entityTypeName,
-                            entityIdTypeName,
-                            params,
-                            generateRepository.extensionOnly
+                            metaInformation
                         )
                     }
 

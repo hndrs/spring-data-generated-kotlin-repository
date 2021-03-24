@@ -41,7 +41,6 @@ internal class SpringRepositoryProcessorTest {
             sources = listOf(entity)
             classpaths = additionalClassPaths()
             annotationProcessors = listOf(SpringRepositoryProcessor())
-            //kaptKotlinGeneratedDir = File("build/generated/source/kaptKotlin/main")
             kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
         }.compile()
 
@@ -56,7 +55,6 @@ internal class SpringRepositoryProcessorTest {
             sources = listOf(entity)
             classpaths = additionalClassPaths()
             annotationProcessors = listOf(SpringRepositoryProcessor())
-            //kaptKotlinGeneratedDir = File("build/generated/source/kaptKotlin/main")
             kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
         }.compile()
 
@@ -72,7 +70,21 @@ internal class SpringRepositoryProcessorTest {
             sources = listOf(entity)
             classpaths = additionalClassPaths()
             annotationProcessors = listOf(SpringRepositoryProcessor())
-            //kaptKotlinGeneratedDir = File("build/generated/source/kaptKotlin/main")
+            kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
+        }.compile()
+
+        assertEquals(ExitCode.OK, result.exitCode)
+    }
+
+    @Disabled("Currently there is no support for generic properties like map. But we keep this test to implement it")
+    @Test
+    @DisplayName("Generic Properties Entity")
+    fun compileGenericPropertiesEntity() {
+        val entity = SourceFile.fromPath(File("src/test/kotlin/io/hndrs/test/GenericPropertiesEntity.kt"))
+        val result = KotlinCompilation().apply {
+            sources = listOf(entity)
+            classpaths = additionalClassPaths()
+            annotationProcessors = listOf(SpringRepositoryProcessor())
             kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
         }.compile()
 

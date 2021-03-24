@@ -7,11 +7,7 @@ interface RepsitoryGenerator {
 
     fun writeClass(
         processingEnv: ProcessingEnvironment,
-        packageName: String,
-        entityTypeName: String,
-        idTypeName: String,
-        params: List<ParameterMeta>,
-        extensionOnly: Boolean
+        meta: MetaInformation,
     )
 
     companion object {

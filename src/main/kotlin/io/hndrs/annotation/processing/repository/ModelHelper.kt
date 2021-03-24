@@ -12,9 +12,9 @@ import kotlin.reflect.KClass
 object ModelHelper {
 
     fun getPackageName(element: Element): String {
-        var foundPackage: Boolean = true
+        var foundPackage: Boolean = false
         var nextElement: Element = element
-        lateinit var packageName: String
+        var packageName: String? = null
         do {
             val enclosingElement = nextElement.enclosingElement
             if (enclosingElement is PackageElement) {
@@ -24,7 +24,10 @@ object ModelHelper {
                 nextElement = enclosingElement
             }
         } while (!foundPackage)
-        return packageName
+        if (packageName != null && !packageName.isBlank()) {
+            return packageName
+        }
+        throw RepositoryGeneratorException("Could not resolve package name for $element")
     }
 
     @Throws(RepositoryGeneratorException::class)
@@ -33,7 +36,7 @@ object ModelHelper {
             it.getAnnotation(Id::class.java) != null
         }?.let {
             getClass(it).simpleName.toString()
-        } ?: throw RepositoryGeneratorException("Could not find @Id annotated property")
+        } ?: throw RepositoryGeneratorException("Could not find @Id annotated property in ${element.simpleName}")
     }
 
     fun getParameterMetas(element: Element): List<ParameterMeta> {

@@ -4,6 +4,7 @@ import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.KotlinCompilation.ExitCode
 import com.tschuchort.compiletesting.SourceFile
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.Aware
@@ -33,11 +34,11 @@ internal class SpringRepositoryProcessorTest {
     }
 
     @Test
-    @DisplayName("Generate Respository ExitCode.OK")
-    fun compileTestSuccessful() {
-        val simpleEntity = SourceFile.fromPath(File("src/test/kotlin/io/hndrs/test/SimpleEntity.kt"))
+    @DisplayName("Simple Entity")
+    fun compileSimpleEntity() {
+        val entity = SourceFile.fromPath(File("src/test/kotlin/io/hndrs/test/SimpleEntity.kt"))
         val result = KotlinCompilation().apply {
-            sources = listOf(simpleEntity)
+            sources = listOf(entity)
             classpaths = additionalClassPaths()
             annotationProcessors = listOf(SpringRepositoryProcessor())
             //kaptKotlinGeneratedDir = File("build/generated/source/kaptKotlin/main")
@@ -45,6 +46,79 @@ internal class SpringRepositoryProcessorTest {
         }.compile()
 
         assertEquals(ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    @DisplayName("ExtensionOnly Entity")
+    fun compileExtensionOnlyEntity() {
+        val entity = SourceFile.fromPath(File("src/test/kotlin/io/hndrs/test/ExtensionOnlyEntity.kt"))
+        val result = KotlinCompilation().apply {
+            sources = listOf(entity)
+            classpaths = additionalClassPaths()
+            annotationProcessors = listOf(SpringRepositoryProcessor())
+            //kaptKotlinGeneratedDir = File("build/generated/source/kaptKotlin/main")
+            kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
+        }.compile()
+
+        assertEquals(ExitCode.OK, result.exitCode)
+    }
+
+    @Disabled("Currently there is no support for nested classes. But we keep this test to implement it")
+    @Test
+    @DisplayName("Nested SimpleEntity")
+    fun compileTestNestedSimple() {
+        val entity = SourceFile.fromPath(File("src/test/kotlin/io/hndrs/test/NestedSimpleEntity.kt"))
+        val result = KotlinCompilation().apply {
+            sources = listOf(entity)
+            classpaths = additionalClassPaths()
+            annotationProcessors = listOf(SpringRepositoryProcessor())
+            //kaptKotlinGeneratedDir = File("build/generated/source/kaptKotlin/main")
+            kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
+        }.compile()
+
+        assertEquals(ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    @DisplayName("All Options")
+    fun compileAllOptions() {
+        val entity = SourceFile.fromPath(File("src/test/kotlin/io/hndrs/test/AllOptionsEntity.kt"))
+        val result = KotlinCompilation().apply {
+            sources = listOf(entity)
+            classpaths = additionalClassPaths()
+            annotationProcessors = listOf(SpringRepositoryProcessor())
+            kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
+        }.compile()
+
+        assertEquals(ExitCode.COMPILATION_ERROR, result.exitCode)
+    }
+
+    @Test
+    @DisplayName("Missing @Id Annotation")
+    fun compileMissingIdAnnotation() {
+        val entity = SourceFile.fromPath(File("src/test/kotlin/io/hndrs/test/SimpleEntityMissingIdAnnotation.kt"))
+        val result = KotlinCompilation().apply {
+            sources = listOf(entity)
+            classpaths = additionalClassPaths()
+            annotationProcessors = listOf(SpringRepositoryProcessor())
+            kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
+        }.compile()
+
+        assertEquals(ExitCode.COMPILATION_ERROR, result.exitCode)
+    }
+
+    @Test
+    @DisplayName("Missing PackageName")
+    fun compileMissingPackageName() {
+        val entity = SourceFile.fromPath(File("src/test/kotlin/io/hndrs/test/SimpleEntityMissingPackageName.kt"))
+        val result = KotlinCompilation().apply {
+            sources = listOf(entity)
+            classpaths = additionalClassPaths()
+            annotationProcessors = listOf(SpringRepositoryProcessor())
+            kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
+        }.compile()
+
+        assertEquals(ExitCode.COMPILATION_ERROR, result.exitCode)
     }
 
     private fun additionalClassPaths(): List<File> {

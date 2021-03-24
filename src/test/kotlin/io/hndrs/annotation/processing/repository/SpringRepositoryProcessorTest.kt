@@ -90,7 +90,7 @@ internal class SpringRepositoryProcessorTest {
             kaptArgs[KotlinCompilation.OPTION_KAPT_KOTLIN_GENERATED]
         }.compile()
 
-        assertEquals(ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertEquals(ExitCode.OK, result.exitCode)
     }
 
     @Test

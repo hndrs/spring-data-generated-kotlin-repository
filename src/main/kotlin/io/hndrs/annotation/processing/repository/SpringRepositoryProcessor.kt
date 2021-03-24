@@ -27,12 +27,12 @@ class SpringRepositoryProcessor : AbstractProcessor() {
         for (annotation in annotations!!) {
             val annotatedElements: Set<Element> = roundEnv.getElementsAnnotatedWith(annotation)
             annotatedElements.forEach {
-                val generateRepository = it.getAnnotation(GenerateRepository::class.java)
-                val packageName = ModelHelper.getPackageName(it)
-                val entityTypeName = it.simpleName.toString()
-                val entityIdTypeName = ModelHelper.getIdTypeName(it)
-                val params = ModelHelper.getParameterMetas(it)
                 try {
+                    val generateRepository = it.getAnnotation(GenerateRepository::class.java)
+                    val packageName = ModelHelper.getPackageName(it)
+                    val entityTypeName = it.simpleName.toString()
+                    val entityIdTypeName = ModelHelper.getIdTypeName(it)
+                    val params = ModelHelper.getParameterMetas(it)
                     when (generateRepository.type) {
                         Type.MONGO -> MongoRepsitoryGenerator.writeClass(
                             processingEnv,
@@ -45,7 +45,7 @@ class SpringRepositoryProcessor : AbstractProcessor() {
                     }
 
                 } catch (e: Exception) {
-                    processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "Could not write class due to exception $e")
+                    processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, e.message)
                 }
             }
         }

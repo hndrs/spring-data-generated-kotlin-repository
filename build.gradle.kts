@@ -43,7 +43,7 @@ repositories {
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "hndrs_kotlin-data-mongodb-spring-boot-starter")
+        property("sonar.projectKey", "hndrs_spring-data-generated-kotlin-repository")
         property("sonar.organization", "hndrs")
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.exclusions", "**/sample/**")
@@ -90,6 +90,11 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.mockk:mockk:1.10.6")
+    testImplementation("org.assertj:assertj-core:3.19.0")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.3.6")
+    //For the test to compile the generated repository we need the spring dependencies
+    testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
 }
 
 dependencyManagement {
@@ -153,10 +158,10 @@ publishing {
 
 publishingInfo {
     name = rootProject.name
-    description = "Kotlin Extensions for Spring Data MongoDB"
-    url = "https://github.com/hndrs/spring-data-mongodb-kotlin-extension"
+    description = "Kotlin Extensions for Spring Data"
+    url = "https://github.com/hndrs/spring-data-generated-kotlin-repository"
     license = io.hndrs.gradle.plugin.License(
-        "https://github.com/hndrs/spring-data-mongodb-kotlin-extension/blob/main/LICENSE",
+        "https://github.com/hndrs/spring-data-generated-kotlin-repository/blob/main/LICENSE",
         "MIT License"
     )
     developers = listOf(
@@ -164,7 +169,7 @@ publishingInfo {
     )
     organization = io.hndrs.gradle.plugin.Organization("hndrs", "https://oss.hndrs.io")
     scm = io.hndrs.gradle.plugin.Scm(
-        "scm:git:git://github.com/hndrs/spring-data-mongodb-kotlin-extension",
-        "https://github.com/hndrs/spring-data-mongodb-kotlin-extension"
+        "scm:git:git://github.com/hndrs/spring-data-generated-kotlin-repository",
+        "https://github.com/hndrs/spring-data-generated-kotlin-repository"
     )
 }

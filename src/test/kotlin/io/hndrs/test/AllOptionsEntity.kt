@@ -27,6 +27,29 @@ data class AllOptionsEntity(
     @Options(exclude = true)
     val excluded: String,
 
+    val boolean: Boolean = true,
+
+    @Options(withExists = true)
+    val int: Int = Int.MIN_VALUE,
+
+    @Options(withExists = true)
+    val float: Float = Float.MIN_VALUE,
+
+    @Options(withExists = true)
+    val byte: Byte = Byte.MIN_VALUE,
+
+    @Options(withExists = true)
+    val short: Short = Short.MIN_VALUE,
+
+    @Options(withExists = true)
+    val long: Long = Long.MIN_VALUE,
+
+    @Options(withExists = true)
+    val char: Char = Char.MIN_VALUE,
+
+    @Options(withExists = true)
+    var double: Double = Double.MIN_VALUE,
+
     @Options(updateOnSave = true)
     val lastModifiedAt: Instant
 )

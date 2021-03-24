@@ -62,14 +62,6 @@ object ModelHelper {
 
         return when (type.kind) {
             TypeKind.DECLARED -> (type as DeclaredType).asElement().toString()
-            TypeKind.BOOLEAN -> Boolean::class.qualifiedName!!
-            TypeKind.BYTE -> Byte::class.qualifiedName!!
-            TypeKind.SHORT -> Short::class.qualifiedName!!
-            TypeKind.INT -> Int::class.qualifiedName!!
-            TypeKind.LONG -> Long::class.qualifiedName!!
-            TypeKind.CHAR -> Char::class.qualifiedName!!
-            TypeKind.FLOAT -> Float::class.qualifiedName!!
-            TypeKind.DOUBLE -> Double::class.qualifiedName!!
             else -> throw Exception("Unknown type: $type, kind: ${type.kind}")
         }
     }
@@ -87,14 +79,6 @@ object ModelHelper {
 
         return when (type.kind) {
             TypeKind.DECLARED -> declaredTypeSimple(type as DeclaredType)
-            TypeKind.BOOLEAN -> Boolean::class.simpleName!!
-            TypeKind.BYTE -> Byte::class.simpleName!!
-            TypeKind.SHORT -> Short::class.simpleName!!
-            TypeKind.INT -> Int::class.simpleName!!
-            TypeKind.LONG -> Long::class.simpleName!!
-            TypeKind.CHAR -> Char::class.simpleName!!
-            TypeKind.FLOAT -> Float::class.simpleName!!
-            TypeKind.DOUBLE -> Double::class.simpleName!!
             else -> throw Exception("Unknown type: $type, kind: ${type.kind}")
         }
     }
